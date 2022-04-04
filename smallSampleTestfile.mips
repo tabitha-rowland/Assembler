@@ -1,0 +1,37 @@
+main:   lw $a0, 0($t0)
+begin:  addi $t0, $zero, 0        # beginning
+        addi $t1, $zero, 1
+loop:   slt $t2, $a0, $t1         # top of loop
+        bne $t2, $zero, finish
+        add $t0, $t0, $t1
+        addi $t1, $t1, 2
+        j loop                    # bottom of loop
+finish: add $v0, $t0, $zero
+        sll $t1, $t2, 10        #R format instructions
+        srl $t1, $t2, 10
+        jr $s0
+        add $s1, $s2, $s3
+        addu $t1, $t2, $t3
+        sub $t1, $t7, $t5
+        subu $t1, $t2, $t6
+        and $t1, $t2, $t8
+        or $t1, $t2, $t4
+        nor $t1, $t2, $a1
+        slt $t1, $t2, $a3
+        sltu $t1, $t2, $a2      
+        add $t1, $t2, $a9       #invalid register
+        elf $t1, $t2, $t6       #invalid command
+        beq $t1, $t2, loop2         #I format instructions
+        bne $t1, $t2, 100
+        addi $t1, $t2, 100
+        addiu $t1, $t2, 100
+        slti $t1, $t2, 100
+loop2:  sltiu $t1, $t2, 100
+        andi $t1, $t2, 100
+        ori $t1, $t2, 100
+        lui $t1, 100
+        lw $t1, 100($t2)
+        sw $t1, 100($t2)
+        j loop2                  #J format instructions
+        jal 1000
+

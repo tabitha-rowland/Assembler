@@ -1,0 +1,139 @@
+# An alternate makefile.  This makefile compiles .c files into .o object
+# files, then links the .o files to create an executable.  It has many more
+# targets (and requires the developer to create a new target stanza for
+# each new .c source file), but the advantage is that when you modify one
+# source file, the system only has to recompile the one file (and relink
+# everything into an executable), not all of the unmodified source files.
+
+GCC=gcc -Wall -Wextra -Wpedantic -Wformat -Wshadow -Wredundant-decls \
+    -Wstrict-prototypes
+# Can also use -Wtraditional or -Wmissing-prototypes
+
+#  Switch to alternative versions of the all target as you're ready for them.
+# all:	assembler
+# all:	testLabelTable assembler
+all:	testLabelTable testGetNTokens testPass1 testPrintAsBinary assembler
+
+testLabelTable: assembler.h \
+	LabelTableArrayList.o \
+    	process_arguments.o \
+	printDebug.o \
+	printError.o \
+	same.o \
+    	testLabelTable.o
+	$(GCC) -g process_arguments.o same.o \
+		LabelTableArrayList.o printDebug.o printError.o \
+	    	testLabelTable.o -o testLabelTable
+
+testGetNTokens: 	assembler.h \
+	getToken.o \
+	getNTokens.o \
+	printDebug.o \
+	printError.o \
+	same.o \
+    	testGetNTokens.o
+	$(GCC) -g testGetNTokens.o getNTokens.o getToken.o \
+	    printDebug.o printError.o same.o -o testGetNTokens
+
+testPass1: 	assembler.h \
+    	LabelTableArrayList.o \
+    	process_arguments.o \
+	getToken.o \
+	getNTokens.o \
+	pass1.o \
+	printDebug.o \
+	printError.o \
+	same.o \
+	testPass1.o
+	$(GCC) -g LabelTableArrayList.o process_arguments.o \
+	    getNTokens.o getToken.o pass1.o \
+	    printDebug.o printError.o same.o testPass1.o -o testPass1
+
+assembler: 	assembler.h \
+    	process_arguments.h \
+    	LabelTableArrayList.o \
+    	process_arguments.o \
+	getInstName.o \
+	getToken.o \
+	getNTokens.o \
+	pass1.o \
+	pass2.o \
+	printAsBinary.o \
+	printDebug.o \
+	printError.o \
+	same.o \
+	assembler.o
+	$(GCC) -g LabelTableArrayList.o process_arguments.o \
+	    getInstName.o getNTokens.o getToken.o pass1.o pass2.o \
+	    printAsBinary.o printDebug.o printError.o \
+	    same.o assembler.o -o assembler
+
+testPrintAsBinary: 	assembler.h \
+	printAsBinary.o \
+	LabelTableArrayList.o \
+	printDebug.o \
+	printError.o \
+	same.o \
+	testPrintAsBinary.o
+	$(GCC) -g LabelTableArrayList.o printDebug.o printError.o same.o \
+	    printAsBinary.o testPrintAsBinary.o -o testPrintAsBinary
+
+stripCR:	assembler.h \
+    	process_arguments.h \
+	printDebug.o \
+	printError.o \
+    	process_arguments.o \
+	same.o \
+    	stripCR.o
+	$(GCC) -g printDebug.o printError.o process_arguments.o same.o \
+	    stripCR.o -o stripCR
+
+assembler.h: LabelTableArrayList.h getToken.h \
+    		same.h printFuncs.h process_arguments.h
+	touch assembler.h
+
+same.o: same.h same.c
+	$(GCC) -c -g same.c 
+
+LabelTableArrayList.o: LabelTableArrayList.h LabelTableArrayList.c
+	$(GCC) -c -g LabelTableArrayList.c 
+
+process_arguments.o: process_arguments.h process_arguments.c
+	$(GCC) -c -g process_arguments.c
+
+printDebug.o: printFuncs.h printDebug.c
+	$(GCC) -c -g printDebug.c
+
+printError.o: printFuncs.h printError.c
+	$(GCC) -c -g printError.c
+
+testLabelTable.o: assembler.h LabelTableArrayList.h testLabelTable.c
+	$(GCC) -c -g testLabelTable.c
+
+getToken.o: getToken.h getToken.c
+	$(GCC) -c -g getToken.c
+
+getNTokens.o: getToken.h getNTokens.c
+	$(GCC) -c -g getNTokens.c
+
+testGetNTokens.o: assembler.h testGetNTokens.c
+	$(GCC) -c -g testGetNTokens.c
+
+pass1.o: assembler.h pass1.c
+	$(GCC) -c -g pass1.c
+
+testPrintAsBinary.o: assembler.h testPrintAsBinary.c
+	$(GCC) -c -g testPrintAsBinary.c
+
+testPass1.o: assembler.h testPass1.c
+	$(GCC) -c -g testPass1.c
+
+pass2.o: assembler.h pass2.c
+	$(GCC) -c -g pass2.c
+
+assembler.o: assembler.h assembler.c
+	$(GCC) -c -g assembler.c
+
+clean: 
+	rm -f *.o testLabelTable assembler testGetNTokens testPass1 \
+	    testPrintAsBinary stripCR
